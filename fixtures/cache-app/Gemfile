@@ -1,0 +1,4 @@
+source 'https://rubygems.org'
+gem 'rake', git: 'https://github.com/ruby/rake.git', tag: 'v13.3.1'
+gem 'json', '3.1.0'
+gem 'cache_path', path: 'local'

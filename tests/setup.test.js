@@ -12,6 +12,7 @@ function actions(input = {}) {
     addPath: value => calls.push(['path', value]),
     setOutput: (name, value) => calls.push([name, value]),
     info: value => calls.push(['info', value]),
+    exportVariable: (name, value) => calls.push(['environment', name, value]),
   };
 }
 
@@ -53,4 +54,10 @@ test('failed installation does not add PATH or expose successful outputs', async
     prepare: async () => { throw new Error('checksum failed'); },
   }), /checksum failed/);
   assert.deepEqual(core.calls, []);
+});
+
+test('explicit Ruby and backend overrides persist even without synchronization', async () => {
+  const core = actions({ 'ruby-version': '4.0.9', 'package-backend': 'native' });
+  await setup({ actions: core, platform: () => ({ asset: 'rb-linux' }), resolve: async () => ({ version: '0.4.1' }), prepare: async () => ({ path: '/tools/rb' }) });
+  assert.deepEqual(core.calls.filter(call => call[0] === 'environment'), [['environment', 'RB_RUBY_VERSION', '4.0.9'], ['environment', 'RB_PACKAGE_BACKEND', 'native']]);
 });

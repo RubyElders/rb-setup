@@ -11,7 +11,38 @@ inputs:
     description: GitHub token for release API access
     default: ${{ github.server_url == 'https://github.com' && github.token || '' }}
     required: false
+  sync:
+    description: Prepare the selected project
+    default: 'false'
+  working-directory:
+    description: Working directory for action operations
+  ruby-version:
+    description: Override the project's Ruby request
+  package-backend:
+    description: Package backend (bundler or native)
+  project-file:
+    description: Project file forwarded through rb -P
+  config-file:
+    description: Configuration file forwarded through rb -c
+  locked:
+    description: Require a matching existing lockfile
+    default: 'true'
+  cache:
+    description: Cache installed gems when sync is enabled (defaults to sync)
+  cache-ruby:
+    description: Cache the exact installed Ruby
+    default: 'false'
+  cache-version:
+    description: Extra cache invalidation salt
 outputs:
+  dependency-cache-hit:
+    description: Whether installed gems were restored from the exact cache key
+  ruby-cache-hit:
+    description: Whether Ruby was restored from the exact cache key
+  ruby-version:
+    description: Prepared Ruby version
+  project-directory:
+    description: Prepared project root
   rb-version:
     description: Installed Ruby Butler version
   rb-path:

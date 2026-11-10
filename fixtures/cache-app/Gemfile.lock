@@ -1,0 +1,34 @@
+GIT
+  remote: https://github.com/ruby/rake.git
+  revision: 8bc1f2b5b942d2ef0fd712c79e04f1b4c100464b
+  tag: v13.3.1
+  specs:
+    rake (13.3.1)
+
+PATH
+  remote: local
+  specs:
+    cache_path (1.0.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    json (3.1.0)
+
+PLATFORMS
+  arm64-darwin
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  cache_path!
+  json (= 3.1.0)
+  rake!
+
+CHECKSUMS
+  cache_path (1.0.0)
+  json (3.1.0) sha256=3ce7ccf8fde58960177a3a756c31f292a4c1e1dedee884547096a5b0604e3bd8
+  rake (13.3.1)
+
+BUNDLED WITH
+  4.0.20

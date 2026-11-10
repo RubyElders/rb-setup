@@ -9,11 +9,12 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "esbuild src/main.js --bundle --platform=node --target=node24 --format=cjs --minify --legal-comments=external --outfile=dist/index.cjs",
+    "build": "esbuild src/main.js --bundle --platform=node --target=node24 --format=cjs --minify --legal-comments=external --outfile=dist/index.cjs && esbuild tests/cache-action/main.js --bundle --platform=node --target=node24 --format=cjs --minify --legal-comments=external --outfile=dist/cache-probe.cjs",
     "lint": "oxlint --deny-warnings src tests",
     "test": "node --test"
   },
   "dependencies": {
+    "@actions/cache": "6.2.0",
     "@actions/core": "3.0.1",
     "@actions/tool-cache": "4.0.0"
   },

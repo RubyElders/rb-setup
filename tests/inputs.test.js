@@ -36,8 +36,8 @@ for (const glibc of ['2.38', '2.9', '', 'musl', 'unknown']) {
 
 test('action metadata exposes only implemented inputs and outputs', async () => {
   const action = parse(await readFile(new URL('../action.yml', import.meta.url), 'utf8'));
-  assert.deepEqual(Object.keys(action.inputs).sort(), ['token', 'version']);
-  assert.deepEqual(Object.keys(action.outputs).sort(), ['rb-path', 'rb-version']);
+  assert.deepEqual(Object.keys(action.inputs).sort(), ['cache', 'cache-ruby', 'cache-version', 'config-file', 'locked', 'package-backend', 'project-file', 'ruby-version', 'sync', 'token', 'version', 'working-directory']);
+  assert.deepEqual(Object.keys(action.outputs).sort(), ['dependency-cache-hit', 'project-directory', 'rb-path', 'rb-version', 'ruby-cache-hit', 'ruby-version']);
   assert.equal(action.inputs.version.default, undefined);
   assert.equal(action.runs.using, 'node24');
   assert.equal(action.runs.main, 'dist/index.cjs');

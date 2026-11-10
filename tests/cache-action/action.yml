@@ -1,0 +1,5 @@
+name: Test project preparation
+description: Exercise real Actions caches with the rb integration fixture
+runs:
+  using: node24
+  main: ../../dist/cache-probe.cjs

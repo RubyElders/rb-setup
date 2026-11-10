@@ -1,0 +1,63 @@
+name: Cache development tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-rb:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: RubyElders/ruby-butler
+          ref: 92b79f7c8715226c31a63464703fd270e08a215d
+          path: rb-source
+      - run: cargo build --release -p rb-cli
+        working-directory: rb-source
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: rb-${{ matrix.os }}
+          path: rb-source/target/release/rb
+          retention-days: 3
+  cold:
+    needs: build-rb
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        backend: [bundler, native]
+    uses: ./.github/workflows/cache-phase.yml
+    with:
+      os: ${{ matrix.os }}
+      backend: ${{ matrix.backend }}
+      phase: cold
+  warm:
+    needs: cold
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        backend: [bundler, native]
+    uses: ./.github/workflows/cache-phase.yml
+    with:
+      os: ${{ matrix.os }}
+      backend: ${{ matrix.backend }}
+      phase: warm
+  uncached:
+    needs: build-rb
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    uses: ./.github/workflows/cache-phase.yml
+    with:
+      os: ${{ matrix.os }}
+      backend: native
+      phase: uncached

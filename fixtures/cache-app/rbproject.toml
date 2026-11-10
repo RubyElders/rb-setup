@@ -1,0 +1,5 @@
+[project]
+name = "rb-setup smoke test"
+
+[scripts]
+verify = "ruby verify.rb"

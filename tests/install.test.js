@@ -120,8 +120,8 @@ test('Windows uses an executable extension for the probe and cached file', async
   assert.ok(await matches(result.path, f.release));
 });
 
-test('child environments remove only the action input token, including Windows casing', () => {
-  assert.deepEqual(childEnvironment({ INPUT_TOKEN: 'hidden', Input_Token: 'hidden', GH_TOKEN: 'user-token', PATH: 'tools' }), { GH_TOKEN: 'user-token', PATH: 'tools' });
+test('child environments remove action service tokens, including Windows casing', () => {
+  assert.deepEqual(childEnvironment({ INPUT_TOKEN: 'hidden', Input_Token: 'hidden', ACTIONS_RUNTIME_TOKEN: 'cache-secret', ACTIONS_ID_TOKEN_REQUEST_TOKEN: 'oidc-secret', GH_TOKEN: 'user-token', PATH: 'tools' }), { GH_TOKEN: 'user-token', PATH: 'tools' });
 });
 
 test('version probing uses a literal executable path and argument array', async () => {

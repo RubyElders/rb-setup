@@ -1,0 +1,31 @@
+name: Cache phase
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      backend:
+        required: true
+        type: string
+      phase:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: rb-${{ inputs.os }}
+          path: .rb-test-bin
+      - run: chmod +x .rb-test-bin/rb
+      - uses: ./tests/cache-action
+        env:
+          RB_SETUP_TEST_BINARY: ${{ github.workspace }}/.rb-test-bin/rb
+          RB_SETUP_TEST_BACKEND: ${{ inputs.backend }}
+          RB_SETUP_CACHE_TEST_MODE: ${{ inputs.phase }}
+          RB_SETUP_CACHE_TEST_SALT: ${{ github.run_id }}-${{ inputs.backend }}
