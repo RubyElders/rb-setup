@@ -25,6 +25,7 @@ jobs:
       - run: chmod +x .rb-test-bin/rb
       - uses: ./tests/cache-action
         env:
+          GH_TOKEN: ${{ github.token }}
           RB_SETUP_TEST_BINARY: ${{ github.workspace }}/.rb-test-bin/rb
           RB_SETUP_TEST_BACKEND: ${{ inputs.backend }}
           RB_SETUP_CACHE_TEST_MODE: ${{ inputs.phase }}

@@ -22,7 +22,7 @@ Reuses verified rb binaries from the runner tool cache. With `sync: true`, the a
 
 Preparation requires an rb version providing `rb info setup`; v0.4.1 supports installation only.
 
-`working-directory`, `ruby-version`, `package-backend`, `project-file` and `config-file` forward normal rb settings. `locked` defaults to `true`; `cache: false` disables gem caching and `cache-version` adds an invalidation salt. Explicit Ruby/backend overrides also apply to following steps.
+`working-directory`, `ruby-version`, `package-backend`, `project-file` and `config-file` forward normal rb settings. `locked` defaults to `true`; `cache: false` disables gem caching and `cache-version` adds an invalidation salt. Explicit Ruby/backend overrides also apply to following steps. Directory/project/config selections apply to this action; repeat them in later commands.
 
 Preparation outputs: `ruby-version`, `project-directory`, `dependency-cache-hit` and `ruby-cache-hit`. Caches contain installation payloads, not project configuration or prepared-state files. [GitHub cache access rules](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#restrictions-for-accessing-a-cache) apply.
 

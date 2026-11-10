@@ -3,6 +3,8 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '23 5 * * 1'
 permissions:
   contents: read
 jobs:
@@ -17,7 +19,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           repository: RubyElders/ruby-butler
-          ref: 92b79f7c8715226c31a63464703fd270e08a215d
+          ref: 2d8de8d1037f8c3a56f1d4225aad4ad456f93e99
           path: rb-source
       - run: cargo build --release -p rb-cli
         working-directory: rb-source
