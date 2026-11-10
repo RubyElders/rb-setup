@@ -1,0 +1,21 @@
+name: Set up Ruby Butler
+description: Install a verified Ruby Butler release and add rb to PATH
+branding:
+  icon: download
+  color: red
+inputs:
+  version:
+    description: Exact stable rb version or latest; defaults to the action's paired release
+    required: false
+  token:
+    description: GitHub token for release API access
+    default: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+    required: false
+outputs:
+  rb-version:
+    description: Installed Ruby Butler version
+  rb-path:
+    description: Absolute path to the rb executable
+runs:
+  using: node24
+  main: dist/index.cjs
