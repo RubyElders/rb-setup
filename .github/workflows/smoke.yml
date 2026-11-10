@@ -1,0 +1,29 @@
+name: Release smoke
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        version: ['', latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: ./
+        id: setup
+        with:
+          version: ${{ matrix.version }}
+      - run: rb version
+      - shell: pwsh
+        env:
+          EXPECTED: ${{ steps.setup.outputs.rb-version }}
+        run: |
+          $actual = @(rb version)
+          if ($LASTEXITCODE -ne 0) { throw 'rb version failed' }
+          if ($actual[0].Trim() -ne "Ruby Butler v$env:EXPECTED") { throw 'Version output does not match' }

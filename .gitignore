@@ -1,0 +1,4 @@
+node_modules/
+coverage/
+fixtures/app/.rb/
+gen-docs/

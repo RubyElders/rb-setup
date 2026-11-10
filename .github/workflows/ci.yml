@@ -1,0 +1,70 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: git diff --exit-code -- dist
+      - run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - uses: ./
+        id: first
+      - uses: ./
+        id: repeated
+        with:
+          version: v0.4.1
+      - run: rb version
+      - shell: pwsh
+        env:
+          FIRST_PATH: ${{ steps.first.outputs.rb-path }}
+          SECOND_PATH: ${{ steps.repeated.outputs.rb-path }}
+          RB_VERSION: ${{ steps.repeated.outputs.rb-version }}
+        run: |
+          if ($env:RB_VERSION -ne '0.4.1') { throw 'Wrong rb version' }
+          if ($env:FIRST_PATH -ne $env:SECOND_PATH) { throw 'Tool cache was not reused' }
+          if (-not (Test-Path $env:SECOND_PATH)) { throw 'Executable is missing' }
+          if ((Get-Command rb).Source -ne $env:SECOND_PATH) { throw 'PATH does not select installed rb' }
+  application:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        backend: [bundler, native]
+    runs-on: ${{ matrix.os }}
+    env:
+      RB_PACKAGE_BACKEND: ${{ matrix.backend }}
+      BUNDLE_FROZEN: 'true'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: ./
+      - run: rb -C fixtures/app run verify
+      - run: rb -C fixtures/app run verify
+      - run: git diff --exit-code -- fixtures/app/Gemfile.lock
