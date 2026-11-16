@@ -4,8 +4,8 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-export async function temporary(t) {
-  const path = await mkdtemp(join(tmpdir(), 'rb setup test '));
+export async function temporary(t, prefix = 'rb setup test ') {
+  const path = await mkdtemp(join(tmpdir(), prefix));
   t.after(() => rm(path, { recursive: true, force: true }));
   return path;
 }

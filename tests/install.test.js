@@ -120,8 +120,8 @@ test('Windows uses an executable extension for the probe and cached file', async
   assert.ok(await matches(result.path, f.release));
 });
 
-test('child environments remove only the action input token, including Windows casing', () => {
-  assert.deepEqual(childEnvironment({ INPUT_TOKEN: 'hidden', Input_Token: 'hidden', GH_TOKEN: 'user-token', PATH: 'tools' }), { GH_TOKEN: 'user-token', PATH: 'tools' });
+test('child environments remove action service tokens, including Windows casing', () => {
+  assert.deepEqual(childEnvironment({ INPUT_TOKEN: 'hidden', Input_Token: 'hidden', ACTIONS_RUNTIME_TOKEN: 'cache-secret', ACTIONS_ID_TOKEN_REQUEST_TOKEN: 'oidc-secret', GH_TOKEN: 'user-token', PATH: 'tools' }), { GH_TOKEN: 'user-token', PATH: 'tools' });
 });
 
 test('version probing uses a literal executable path and argument array', async () => {
@@ -132,7 +132,7 @@ test('version probing uses a literal executable path and argument array', async 
       calls++;
       assert.equal(file, 'path with spaces " and $ characters/rb');
       assert.deepEqual(args, ['version']);
-      assert.deepEqual(options.env, { GH_TOKEN: 'user-token' });
+      assert.deepEqual(options.env, { GH_TOKEN: 'user-token', RB_FORMAT: 'text' });
       assert.equal(options.timeout, 30_000);
       return { stdout: 'Ruby Butler v0.4.1 \n\nOther output\n' };
     },
@@ -181,4 +181,14 @@ test('actual process cannot read INPUT_TOKEN and preserves explicit user credent
   await writeFile(file, '#!/bin/sh\n[ -z "$INPUT_TOKEN" ] || exit 1\n[ "$GH_TOKEN" = "user-owned" ] || exit 1\nprintf "Ruby Butler v0.4.1\\n"\n');
   await chmod(file, 0o755);
   await checkVersion(file, '0.4.1', { environment: { INPUT_TOKEN: 'private-input-canary', GH_TOKEN: 'user-owned' } });
+});
+
+test('version probing uses text without changing the callers output preference', { skip: process.platform === 'win32' }, async t => {
+  const root = await temporary(t);
+  const file = join(root, 'rb');
+  await writeFile(file, '#!/bin/sh\nif [ "$RB_FORMAT" = text ]; then\n  printf "Ruby Butler v0.4.2\\n"\nelse\n  printf \'{"schema_version":1,"command":"version","data":{"version":"0.4.2"}}\\n\'\nfi\n');
+  await chmod(file, 0o755);
+  const environment = { RB_FORMAT: 'json' };
+  await checkVersion(file, '0.4.2', { environment });
+  assert.equal(environment.RB_FORMAT, 'json');
 });

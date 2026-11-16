@@ -2,3 +2,6 @@ node_modules/
 coverage/
 fixtures/app/.rb/
 gen-docs/
+fixtures/cache-app/.rb/
+.rb-test-bin/
+.rb-test-config.toml
