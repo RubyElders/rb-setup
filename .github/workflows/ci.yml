@@ -40,7 +40,7 @@ jobs:
       - uses: ./
         id: repeated
         with:
-          version: v0.4.1
+          version: v0.4.3
       - run: rb version
       - shell: pwsh
         env:
@@ -48,7 +48,7 @@ jobs:
           SECOND_PATH: ${{ steps.repeated.outputs.rb-path }}
           RB_VERSION: ${{ steps.repeated.outputs.rb-version }}
         run: |
-          if ($env:RB_VERSION -ne '0.4.1') { throw 'Wrong rb version' }
+          if ($env:RB_VERSION -ne '0.4.3') { throw 'Wrong rb version' }
           if ($env:FIRST_PATH -ne $env:SECOND_PATH) { throw 'Tool cache was not reused' }
           if (-not (Test-Path $env:SECOND_PATH)) { throw 'Executable is missing' }
           if ((Get-Command rb).Source -ne $env:SECOND_PATH) { throw 'PATH does not select installed rb' }
@@ -60,6 +60,7 @@ jobs:
         backend: [bundler, native]
     runs-on: ${{ matrix.os }}
     env:
+      GH_TOKEN: ${{ github.token }}
       RB_PACKAGE_BACKEND: ${{ matrix.backend }}
       BUNDLE_FROZEN: 'true'
     steps:

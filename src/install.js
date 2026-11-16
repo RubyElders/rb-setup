@@ -8,6 +8,7 @@ import { promisify } from 'node:util';
 import * as toolCache from '@actions/tool-cache';
 
 const execute = promisify(execFile);
+const actionTokens = new Set(['INPUT_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'ACTIONS_ID_TOKEN_REQUEST_TOKEN']);
 
 export async function matches(file, release) {
   try {
@@ -23,14 +24,14 @@ export async function matches(file, release) {
 }
 
 export function childEnvironment(environment = process.env) {
-  return Object.fromEntries(Object.entries(environment).filter(([name]) => name.toUpperCase() !== 'INPUT_TOKEN'));
+  return Object.fromEntries(Object.entries(environment).filter(([name]) => !actionTokens.has(name.toUpperCase())));
 }
 
 export async function checkVersion(file, version, { run = execute, environment = process.env } = {}) {
   let stdout;
   try {
     ({ stdout } = await run(file, ['version'], {
-      env: childEnvironment(environment),
+      env: { ...childEnvironment(environment), RB_FORMAT: 'text' },
       cwd: process.env.RUNNER_TEMP || tmpdir(),
       timeout: 30_000,
       maxBuffer: 64 * 1024,

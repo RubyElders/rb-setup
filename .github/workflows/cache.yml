@@ -1,0 +1,52 @@
+name: Cache tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '43 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Ruby Butler release (defaults to the action's paired release)
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  cold:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, macos-26]
+        backend: [bundler, native]
+    uses: ./.github/workflows/cache-phase.yml
+    with:
+      os: ${{ matrix.os }}
+      backend: ${{ matrix.backend }}
+      phase: cold
+      version: ${{ inputs.version }}
+  warm:
+    needs: cold
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, macos-26]
+        backend: [bundler, native]
+    uses: ./.github/workflows/cache-phase.yml
+    with:
+      os: ${{ matrix.os }}
+      backend: ${{ matrix.backend }}
+      phase: warm
+      version: ${{ inputs.version }}
+  uncached:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, macos-26]
+    uses: ./.github/workflows/cache-phase.yml
+    with:
+      os: ${{ matrix.os }}
+      backend: native
+      phase: uncached
+      version: ${{ inputs.version }}
